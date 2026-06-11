@@ -21713,7 +21713,7 @@ var fullPipelineSchema = external_exports.object({
     "Link do frame no Figma (com node-id na URL). Ex: https://www.figma.com/design/ABC123/arquivo?node-id=1038-6"
   ),
   frameName: external_exports.string().describe(
-    'Nome do frame no formato "[DATA] - [NOME]". Datas aceitas: DD-MM, DD-MM-AA ou YYYY-MM-DD. Ex: "27-05 - Dr. Rodolfo Soares".'
+    'Nome do frame no formato "[DATA] - [NOME]". Datas aceitas: DD-MM, DD-MM-AA ou YYYY-MM-DD. Ex: "27-05 - Dr. Jo\xE3o Exemplo".'
   ),
   mode: external_exports.enum(["auto", "single", "carrossel"]).optional().default("auto").describe(
     "single: exporta o frame inteiro como 1 PNG (estatico, capa reels). carrossel: exporta cada card filho como PNG separado. auto: detecta sozinho (2+ frames filhos = carrossel)."
@@ -21751,7 +21751,7 @@ function parseFrameName(frameName) {
   const sepIndex = frameName.indexOf(" - ");
   if (sepIndex === -1) {
     throw new Error(
-      `Nome do frame nao segue o padrao "[DATA] - [NOME]": "${frameName}". Exemplos: "27-05 - Dr. Rodolfo", "27-05-26 - Dr. Rodolfo", "2026-05-27 - Dr. Rodolfo".`
+      `Nome do frame nao segue o padrao "[DATA] - [NOME]": "${frameName}". Exemplos: "27-05 - Dr. Jo\xE3o", "27-05-26 - Dr. Jo\xE3o", "2026-05-27 - Dr. Jo\xE3o".`
     );
   }
   const rawDate = frameName.substring(0, sepIndex).trim();

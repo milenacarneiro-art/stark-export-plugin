@@ -14,7 +14,7 @@ clickup_list_id: "901324888130"
 clickup_status_final: "ENVIO PENDENTE"
 
 clientes:
-  # "Dr. Rodolfo Soares":
-  #   drive_nome: "Dr. Rodolfo"            # nome exato da pasta no Drive (se diferente do frame)
+  # "Dr. João Exemplo":
+  #   drive_nome: "Dr. João"            # nome exato da pasta no Drive (se diferente do frame)
   #   drive_pasta_ano_id: "1ABC...xyz"     # opcional — ID da pasta do ano para estrutura não-padrão
-  #   clickup_alias: "Rodolfo Soares"      # opcional — nome da subtarefa no ClickUp (se diferente do frame)
+  #   clickup_alias: "João Exemplo"      # opcional — nome da subtarefa no ClickUp (se diferente do frame)

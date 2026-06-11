@@ -55,7 +55,7 @@ Termine a arte no Figma, selecione o frame, copie o link (**Ctrl/Cmd+L**) e rode
 /stark-export:exportar https://www.figma.com/design/ABC/arquivo?node-id=1038-6
 ```
 
-A skill pergunta o nome do frame (ex: `09-06 - Dr. Álvaro Rodrigues`) e faz tudo:
+A skill pergunta o nome do frame (ex: `09-06 - Dr. João Exemplo`) e faz tudo:
 
 1. **Bia revisa a arte**: erros graves de gramática PT-BR e nudez. Reprovado → bloqueia só essa tarefa e mostra o problema (você escolhe: corrigir no Figma ou exportar mesmo assim)
 2. Exporta o frame como PNG (carrossel → 1 PNG por card, automático)
@@ -69,8 +69,8 @@ A skill pergunta o nome do frame (ex: `09-06 - Dr. Álvaro Rodrigues`) e faz tud
 
 ```
 /stark-export:exportar
-https://figma.com/design/...?node-id=10-2 | 09-06 - Dr. Álvaro Rodrigues
-https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Ana Silva
+https://figma.com/design/...?node-id=10-2 | 09-06 - Dr. João Exemplo
+https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Maria Exemplo
 ```
 
 **Reels com vídeo** — avise que é Reels e informe o caminho do `.mp4`; ele sobe junto com a capa.
@@ -78,7 +78,7 @@ https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Ana Silva
 ### Convenção de nome dos frames
 
 ```
-[DATA] - [Nome do cliente]      →  27-05 - Dr. Rodolfo Soares
+[DATA] - [Nome do cliente]      →  27-05 - Dr. João Exemplo
 ```
 
 Datas aceitas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`.
@@ -91,10 +91,10 @@ Só necessário se o nome da pasta no Drive for diferente do nome no frame, ou s
 
 ```yaml
 clientes:
-  "Dr. Rodolfo Soares":
-    drive_nome: "Dr. Rodolfo"          # nome exato da pasta no Drive
+  "Dr. João Exemplo":
+    drive_nome: "Dr. João"          # nome exato da pasta no Drive
     drive_pasta_ano_id: "1ABC...xyz"   # ID da pasta do ano (estrutura não-padrão)
-    clickup_alias: "Rodolfo Soares"    # nome da subtarefa no ClickUp (se diferente do frame)
+    clickup_alias: "João Exemplo"    # nome da subtarefa no ClickUp (se diferente do frame)
 ```
 
 ---

@@ -24,8 +24,8 @@ Vários de uma vez (um por linha, nome do frame opcional após `|`):
 
 ```
 /stark-export:exportar
-https://figma.com/design/...?node-id=10-2 | 09-06 - Dr. Álvaro Rodrigues
-https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Ana Silva
+https://figma.com/design/...?node-id=10-2 | 09-06 - Dr. João Exemplo
+https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Maria Exemplo
 ```
 
 ## Execução
@@ -42,7 +42,7 @@ Se `~/.stark-export/config.json` ou `~/.stark-export/credentials.json` não exis
 
 - Sem links no input → pedir: *"Cole o(s) link(s) do Figma (um por linha). Dica: selecione o frame e Ctrl/Cmd+L. Se quiser, já cole o nome do frame após `|`."*
 - Cada link precisa de `node-id` na URL. Sem node-id → pedir para copiar o link com o frame selecionado.
-- Para cada link sem nome de frame informado: perguntar *"Nome do frame? (ex: `09-06 - Dr. Álvaro Rodrigues`)"* — pedir todos de uma vez quando houver vários.
+- Para cada link sem nome de frame informado: perguntar *"Nome do frame? (ex: `09-06 - Dr. João Exemplo`)"* — pedir todos de uma vez quando houver vários.
 - O nome segue `[DATA] - [Nome do cliente]` (datas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`).
 - Se for **Reels** (designer mencionar ou nome indicar): perguntar se há `.mp4` local para subir junto e o caminho.
 

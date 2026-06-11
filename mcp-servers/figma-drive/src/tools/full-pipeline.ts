@@ -9,7 +9,7 @@ export const fullPipelineSchema = z.object({
   ),
   frameName: z.string().describe(
     'Nome do frame no formato "[DATA] - [NOME]". Datas aceitas: DD-MM, DD-MM-AA ou YYYY-MM-DD. ' +
-    'Ex: "27-05 - Dr. Rodolfo Soares".'
+    'Ex: "27-05 - Dr. João Exemplo".'
   ),
   mode: z.enum(['auto', 'single', 'carrossel']).optional().default('auto').describe(
     'single: exporta o frame inteiro como 1 PNG (estatico, capa reels). ' +
@@ -56,7 +56,7 @@ function parseFrameName(frameName: string): { date: string; clientName: string }
   if (sepIndex === -1) {
     throw new Error(
       `Nome do frame nao segue o padrao "[DATA] - [NOME]": "${frameName}". ` +
-      'Exemplos: "27-05 - Dr. Rodolfo", "27-05-26 - Dr. Rodolfo", "2026-05-27 - Dr. Rodolfo".'
+      'Exemplos: "27-05 - Dr. João", "27-05-26 - Dr. João", "2026-05-27 - Dr. João".'
     );
   }
   const rawDate = frameName.substring(0, sepIndex).trim();
