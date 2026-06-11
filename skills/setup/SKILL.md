@@ -9,7 +9,7 @@ user-invocable: true
 
 # /stark-export:setup
 
-Configuração única. O servidor figma-drive já vem pronto no plugin (sem `npm install`, sem build) — só faltam as credenciais.
+Configuração única: copia o `credentials.json`, salva o token do Figma e confere o ClickUp.
 
 ## O que configura
 
@@ -38,7 +38,7 @@ Configuração única. O servidor figma-drive já vem pronto no plugin (sem `npm
    - Token já existente no arquivo e usuário não quer trocar → manter.
 
 4. **ClickUp** — verificar se o MCP/conector ClickUp está conectado (alguma tool `clickup_*` disponível).
-   - Não conectado → orientar a conectar o conector ClickUp do Claude Code (`/mcp` ou Configurações → Conectores → ClickUp) — o mesmo que o resto do time já usa. Sem token manual.
+   - Não conectado → orientar: no Claude Code, `/mcp` (ou Configurações → Conectores) → conectar **ClickUp**.
 
 5. **Resumo** — exibir:
    ```

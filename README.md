@@ -10,32 +10,40 @@ Link do Figma → revisão da Bia (gramática + nudez) → PNG (detecta carrosse
 
 ---
 
-## Instalação (3 passos)
+## Instalação
 
-### 1. Instale o plugin
+### 1. Instale o Node.js
 
-Pelo canal da organização Stark no Claude Code (seção de plugins), ou via marketplace:
+Baixe a versão LTS em [nodejs.org](https://nodejs.org) e instale (se já tiver, pule).
+
+### 2. Instale o plugin
+
+No Claude Code:
 
 ```
 /plugin marketplace add milenacarneiro-art/stark-export-plugin
 /plugin install stark-export
 ```
 
-> Não precisa de `npm install`, build, yt-dlp nem ffmpeg. O servidor de export já vem pronto dentro do plugin. Só é necessário ter o **Node.js 18+** instalado ([nodejs.org](https://nodejs.org), versão LTS).
+### 3. Conecte o ClickUp
 
-### 2. Tenha em mãos
+No Claude Code: `/mcp` (ou Configurações → Conectores) → conectar **ClickUp**.
 
-| Item | Onde conseguir |
-|---|---|
-| `credentials.json` | Pedir ao responsável pelo Drive da Stark (service account do Google) |
-| Token do Figma | figma.com → Settings → Security → Personal access tokens |
-| Conector ClickUp | Conectar no Claude Code (`/mcp` ou Configurações → Conectores) — sem token manual |
+### 4. Peça o credentials.json
 
-### 3. Use
+Peça o arquivo `credentials.json` ao responsável pelo Drive da Stark e salve no seu Desktop.
 
-Não precisa rodar setup antes: na primeira vez que você rodar `/stark-export:exportar`, ele configura tudo sozinho (pergunta onde está o `credentials.json` e o token do Figma) e já segue para o export.
+### 5. Gere o token do Figma
 
-Se preferir configurar separado: `/stark-export:setup`.
+figma.com → Settings → Security → Personal access tokens → criar token (escopo File content: Read) → copie.
+
+### 6. Rode o primeiro export
+
+```
+/stark-export:exportar [link do frame no Figma]
+```
+
+Na primeira vez, ele pergunta onde está o `credentials.json` e pede o token do Figma — responde e ele já exporta. Pronto.
 
 ---
 
