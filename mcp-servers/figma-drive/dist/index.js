@@ -21712,8 +21712,8 @@ var fullPipelineSchema = external_exports.object({
   figmaUrl: external_exports.string().describe(
     "Link do frame no Figma (com node-id na URL). Ex: https://www.figma.com/design/ABC123/arquivo?node-id=1038-6"
   ),
-  frameName: external_exports.string().describe(
-    'Nome do frame no formato "[DATA] - [NOME]". Datas aceitas: DD-MM, DD-MM-AA ou YYYY-MM-DD. Ex: "27-05 - Dr. Jo\xE3o Exemplo".'
+  frameName: external_exports.string().optional().describe(
+    'Nome do frame no formato "[DATA] - [NOME]" (ex: "27-05 - Dr. Jo\xE3o Exemplo"). Se omitido, o nome \xE9 lido automaticamente do Figma. Use apenas para sobrescrever um frame cujo nome no Figma nao segue o padrao.'
   ),
   mode: external_exports.enum(["auto", "single", "carrossel"]).optional().default("auto").describe(
     "single: exporta o frame inteiro como 1 PNG (estatico, capa reels). carrossel: exporta cada card filho como PNG separado. auto: detecta sozinho (2+ frames filhos = carrossel)."
@@ -21751,7 +21751,7 @@ function parseFrameName(frameName) {
   const sepIndex = frameName.indexOf(" - ");
   if (sepIndex === -1) {
     throw new Error(
-      `Nome do frame nao segue o padrao "[DATA] - [NOME]": "${frameName}". Exemplos: "27-05 - Dr. Jo\xE3o", "27-05-26 - Dr. Jo\xE3o", "2026-05-27 - Dr. Jo\xE3o".`
+      `Nome do frame nao segue o padrao "[DATA] - [NOME]": "${frameName}". Renomeie o frame no Figma (ex: "27-05 - Dr. Jo\xE3o") ou passe frameName manualmente.`
     );
   }
   const rawDate = frameName.substring(0, sepIndex).trim();
@@ -21761,23 +21761,27 @@ function parseFrameName(frameName) {
 var CONTAINER_TYPES = /* @__PURE__ */ new Set(["FRAME", "COMPONENT", "INSTANCE", "GROUP", "SECTION"]);
 async function handleFullPipeline(input) {
   const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);
-  const { date: date3, clientName: parsedName } = parseFrameName(input.frameName);
-  const clientName = input.clientName || parsedName;
-  const prefix = `${date3}-${clientName}`;
   let nodeIds = [nodeId];
   let modeUsed = "single";
-  if (input.mode !== "single") {
+  let frameName = input.frameName;
+  if (input.mode !== "single" || !frameName) {
     const info = await getFrameInfo(fileKey, nodeId);
-    const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
-    const isCarrossel = input.mode === "carrossel" || input.mode === "auto" && cards.length >= 2;
-    if (isCarrossel) {
-      if (cards.length === 0) {
-        throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
+    if (!frameName) frameName = info.name;
+    if (input.mode !== "single") {
+      const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
+      const isCarrossel = input.mode === "carrossel" || input.mode === "auto" && cards.length >= 2;
+      if (isCarrossel) {
+        if (cards.length === 0) {
+          throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
+        }
+        nodeIds = cards.map((c) => c.nodeId);
+        modeUsed = `carrossel (${cards.length} cards)`;
       }
-      nodeIds = cards.map((c) => c.nodeId);
-      modeUsed = `carrossel (${cards.length} cards)`;
     }
   }
+  const { date: date3, clientName: parsedName } = parseFrameName(frameName);
+  const clientName = input.clientName || parsedName;
+  const prefix = `${date3}-${clientName}`;
   if (input.dryRun) {
     const upload = await uploadToDrive({
       clientName,
@@ -21786,7 +21790,7 @@ async function handleFullPipeline(input) {
       startFolderId: input.startFolderId,
       folderSuffix: input.folderSuffix
     });
-    return result({ frameName: input.frameName, date: date3, clientName, mode: modeUsed, nodeIds, upload });
+    return result({ frameName, date: date3, clientName, mode: modeUsed, nodeIds, upload });
   }
   const exportResult = await exportFigmaFrames({
     fileKey,
@@ -21809,7 +21813,7 @@ async function handleFullPipeline(input) {
     folderSuffix: input.folderSuffix
   });
   return result({
-    frameName: input.frameName,
+    frameName,
     date: date3,
     clientName,
     mode: modeUsed,
@@ -21852,15 +21856,15 @@ var reviewFrameSchema = external_exports.object({
 async function handleReviewFrame(input) {
   const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);
   let targets;
+  let frameName;
   if (input.nodeIds?.length) {
     targets = input.nodeIds.map((n) => ({ nodeId: n.replace("-", ":"), label: n }));
-  } else if (input.mode === "single") {
-    targets = [{ nodeId, label: "frame" }];
   } else {
     const info = await getFrameInfo(fileKey, nodeId);
+    frameName = info.name;
     const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
     const isCarrossel = input.mode === "carrossel" || input.mode === "auto" && cards.length >= 2;
-    targets = isCarrossel && cards.length > 0 ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, "0")} \u2014 ${c.name}` })) : [{ nodeId: info.nodeId, label: info.name }];
+    targets = input.mode !== "single" && isCarrossel && cards.length > 0 ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, "0")} \u2014 ${c.name}` })) : [{ nodeId: info.nodeId, label: info.name }];
   }
   const content = [];
   const summary = [];
@@ -21879,6 +21883,7 @@ async function handleReviewFrame(input) {
     type: "text",
     text: JSON.stringify({
       fileKey,
+      frameName,
       frames_verificados: targets.length,
       textos: summary,
       avisos: warnings,

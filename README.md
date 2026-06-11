@@ -55,7 +55,7 @@ Termine a arte no Figma, selecione o frame, copie o link (**Ctrl/Cmd+L**) e rode
 /stark-export:exportar https://www.figma.com/design/ABC/arquivo?node-id=1038-6
 ```
 
-A skill pergunta o nome do frame (ex: `09-06 - Dr. João Exemplo`) e faz tudo:
+O nome do frame (cliente + data) é lido automaticamente do Figma — não precisa digitar nada. A skill faz tudo:
 
 1. **Bia revisa a arte**: erros graves de gramática PT-BR e nudez. Reprovado → bloqueia só essa tarefa e mostra o problema (você escolhe: corrigir no Figma ou exportar mesmo assim)
 2. Exporta o frame como PNG (carrossel → 1 PNG por card, automático)
@@ -65,23 +65,25 @@ A skill pergunta o nome do frame (ex: `09-06 - Dr. João Exemplo`) e faz tudo:
 
 **Se a Bia reprovar:** corrija no Figma e mande seguir — ela reverifica só o que foi reprovado e libera a exportação.
 
-**Vários de uma vez** — cole um link por linha (nome do frame opcional após `|`):
+**Vários de uma vez** — cole um link por linha:
 
 ```
 /stark-export:exportar
-https://figma.com/design/...?node-id=10-2 | 09-06 - Dr. João Exemplo
-https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Maria Exemplo
+https://figma.com/design/...?node-id=10-2
+https://figma.com/design/...?node-id=10-8
 ```
 
 **Reels com vídeo** — avise que é Reels e informe o caminho do `.mp4`; ele sobe junto com a capa.
 
 ### Convenção de nome dos frames
 
+O frame no Figma deve se chamar:
+
 ```
 [DATA] - [Nome do cliente]      →  27-05 - Dr. João Exemplo
 ```
 
-Datas aceitas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`.
+Datas aceitas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`. É desse nome que saem o cliente e a data usados no Drive e no ClickUp — frame fora do padrão, a skill pergunta antes de seguir.
 
 ---
 

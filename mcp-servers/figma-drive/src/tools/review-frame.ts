@@ -27,15 +27,15 @@ export async function handleReviewFrame(input: ReviewFrameInput) {
 
   // Determinar quais nodes revisar
   let targets: Array<{ nodeId: string; label: string }>;
+  let frameName: string | undefined;
   if (input.nodeIds?.length) {
     targets = input.nodeIds.map((n) => ({ nodeId: n.replace('-', ':'), label: n }));
-  } else if (input.mode === 'single') {
-    targets = [{ nodeId, label: 'frame' }];
   } else {
     const info = await getFrameInfo(fileKey, nodeId);
+    frameName = info.name;
     const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
     const isCarrossel = input.mode === 'carrossel' || (input.mode === 'auto' && cards.length >= 2);
-    targets = isCarrossel && cards.length > 0
+    targets = input.mode !== 'single' && isCarrossel && cards.length > 0
       ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, '0')} — ${c.name}` }))
       : [{ nodeId: info.nodeId, label: info.name }];
   }
@@ -59,6 +59,7 @@ export async function handleReviewFrame(input: ReviewFrameInput) {
     type: 'text',
     text: JSON.stringify({
       fileKey,
+      frameName,
       frames_verificados: targets.length,
       textos: summary,
       avisos: warnings,

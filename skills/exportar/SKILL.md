@@ -20,11 +20,11 @@ Recebe link(s) do Figma → revisão da Bia (gramática + nudez) → exporta PNG
 /stark-export:exportar --dry-run [link]   ← só confere a pasta destino no Drive, não sobe nada
 ```
 
-Vários de uma vez (um por linha, nome do frame opcional após `|`):
+Vários de uma vez (um link por linha). O nome do frame é lido automaticamente do Figma — só informar após `|` se quiser sobrescrever:
 
 ```
 /stark-export:exportar
-https://figma.com/design/...?node-id=10-2 | 09-06 - Dr. João Exemplo
+https://figma.com/design/...?node-id=10-2
 https://figma.com/design/...?node-id=10-8 | 10-06 - Dra. Maria Exemplo
 ```
 
@@ -40,21 +40,20 @@ Se `~/.stark-export/config.json` ou `~/.stark-export/credentials.json` não exis
 
 ### 1. Coletar a fila
 
-- Sem links no input → pedir: *"Cole o(s) link(s) do Figma (um por linha). Dica: selecione o frame e Ctrl/Cmd+L. Se quiser, já cole o nome do frame após `|`."*
+- Sem links no input → pedir: *"Cole o(s) link(s) do Figma (um por linha). Dica: selecione o frame e Ctrl/Cmd+L."*
 - Cada link precisa de `node-id` na URL. Sem node-id → pedir para copiar o link com o frame selecionado.
-- Para cada link sem nome de frame informado: perguntar *"Nome do frame? (ex: `09-06 - Dr. João Exemplo`)"* — pedir todos de uma vez quando houver vários.
-- O nome segue `[DATA] - [Nome do cliente]` (datas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`).
+- **Não perguntar o nome do frame** — o tool lê do Figma automaticamente. O nome no Figma deve seguir `[DATA] - [Nome do cliente]` (datas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`); se o tool retornar erro de padrão, aí sim perguntar o nome correto e repassar via `frameName`.
 - Se for **Reels** (designer mencionar ou nome indicar): perguntar se há `.mp4` local para subir junto e o caminho.
 
 ### 2. Config do cliente
 
 Ler `${CLAUDE_PLUGIN_ROOT}/config/clientes.yaml` **uma vez** no início:
 - `clickup_list_id` e `clickup_status_final`
-- Para cada cliente da fila (fuzzy match no nome): `drive_nome` → `clientName`, `drive_pasta_ano_id` → `startFolderId`, `clickup_alias` → nome a usar na busca do ClickUp. Cliente fora do config → não passar `clientName` nem `startFolderId` (o tool usa o nome do frame).
+- O cliente e a data de cada tarefa vêm do `frameName` retornado pela revisão da Bia (passo 3). Com o cliente identificado (fuzzy match no nome): `drive_nome` → `clientName`, `drive_pasta_ano_id` → `startFolderId`, `clickup_alias` → nome a usar na busca do ClickUp. Cliente fora do config → não passar `clientName` nem `startFolderId` (o tool usa o nome do frame).
 
 ### 3. Revisão de Arte — Bia (antes de exportar, sempre)
 
-Para cada tarefa, chamar `review_figma_frame({ figmaUrl, mode: "auto" })` → retorna os textos extraídos + screenshot de cada card. Analisar:
+Para cada tarefa, chamar `review_figma_frame({ figmaUrl, mode: "auto" })` → retorna o `frameName` (cliente + data), os textos extraídos e o screenshot de cada card. Analisar:
 
 **Gramática PT-BR — só erro grave bloqueia:** palavra escrita errada ("cirujia"), acento faltando em palavra comum ("medico", "publico", "voce"), pontuação que prejudica a leitura, troca de letras por som ("exsesso"). **NÃO bloquear por:** capitalização em títulos, gírias/informalidade intencional, abreviações ("Dr.", "CRM"), nomes próprios, emojis, números.
 
@@ -83,11 +82,11 @@ Para cada tarefa, chamar `review_figma_frame({ figmaUrl, mode: "auto" })` → re
 ```
 figma_to_drive({
   figmaUrl: "[link]",
-  frameName: "[DATA] - [Nome]",
-  mode: "auto",                       // detecta carrossel sozinho
+  mode: "auto",                       // detecta carrossel sozinho; nome do frame lido do Figma
   clientName: "[drive_nome, se houver]",
   startFolderId: "[drive_pasta_ano_id, se houver]",
-  extraFiles: ["[caminho.mp4, se Reels]"]
+  extraFiles: ["[caminho.mp4, se Reels]"],
+  frameName: "[só se o nome no Figma não seguir o padrão]"
 })
 ```
 

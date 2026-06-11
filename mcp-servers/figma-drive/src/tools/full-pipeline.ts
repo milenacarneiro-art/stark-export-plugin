@@ -7,9 +7,10 @@ export const fullPipelineSchema = z.object({
   figmaUrl: z.string().describe(
     'Link do frame no Figma (com node-id na URL). Ex: https://www.figma.com/design/ABC123/arquivo?node-id=1038-6'
   ),
-  frameName: z.string().describe(
-    'Nome do frame no formato "[DATA] - [NOME]". Datas aceitas: DD-MM, DD-MM-AA ou YYYY-MM-DD. ' +
-    'Ex: "27-05 - Dr. João Exemplo".'
+  frameName: z.string().optional().describe(
+    'Nome do frame no formato "[DATA] - [NOME]" (ex: "27-05 - Dr. João Exemplo"). ' +
+    'Se omitido, o nome é lido automaticamente do Figma. Use apenas para sobrescrever ' +
+    'um frame cujo nome no Figma nao segue o padrao.'
   ),
   mode: z.enum(['auto', 'single', 'carrossel']).optional().default('auto').describe(
     'single: exporta o frame inteiro como 1 PNG (estatico, capa reels). ' +
@@ -56,7 +57,7 @@ function parseFrameName(frameName: string): { date: string; clientName: string }
   if (sepIndex === -1) {
     throw new Error(
       `Nome do frame nao segue o padrao "[DATA] - [NOME]": "${frameName}". ` +
-      'Exemplos: "27-05 - Dr. João", "27-05-26 - Dr. João", "2026-05-27 - Dr. João".'
+      'Renomeie o frame no Figma (ex: "27-05 - Dr. João") ou passe frameName manualmente.'
     );
   }
   const rawDate = frameName.substring(0, sepIndex).trim();
@@ -68,25 +69,31 @@ export const CONTAINER_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP
 
 export async function handleFullPipeline(input: FullPipelineInput) {
   const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);
-  const { date, clientName: parsedName } = parseFrameName(input.frameName);
-  const clientName = input.clientName || parsedName;
-  const prefix = `${date}-${clientName}`;
 
-  // Detectar carrossel: cards sao frames filhos do frame principal
+  // Nome do frame: lido automaticamente do Figma quando nao informado.
+  // A mesma consulta detecta carrossel (cards sao frames filhos do frame principal).
   let nodeIds = [nodeId];
   let modeUsed = 'single';
-  if (input.mode !== 'single') {
+  let frameName = input.frameName;
+  if (input.mode !== 'single' || !frameName) {
     const info = await getFrameInfo(fileKey, nodeId);
-    const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
-    const isCarrossel = input.mode === 'carrossel' || (input.mode === 'auto' && cards.length >= 2);
-    if (isCarrossel) {
-      if (cards.length === 0) {
-        throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
+    if (!frameName) frameName = info.name;
+    if (input.mode !== 'single') {
+      const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
+      const isCarrossel = input.mode === 'carrossel' || (input.mode === 'auto' && cards.length >= 2);
+      if (isCarrossel) {
+        if (cards.length === 0) {
+          throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
+        }
+        nodeIds = cards.map((c) => c.nodeId);
+        modeUsed = `carrossel (${cards.length} cards)`;
       }
-      nodeIds = cards.map((c) => c.nodeId);
-      modeUsed = `carrossel (${cards.length} cards)`;
     }
   }
+
+  const { date, clientName: parsedName } = parseFrameName(frameName);
+  const clientName = input.clientName || parsedName;
+  const prefix = `${date}-${clientName}`;
 
   if (input.dryRun) {
     const upload = await uploadToDrive({
@@ -96,7 +103,7 @@ export async function handleFullPipeline(input: FullPipelineInput) {
       startFolderId: input.startFolderId,
       folderSuffix: input.folderSuffix,
     });
-    return result({ frameName: input.frameName, date, clientName, mode: modeUsed, nodeIds, upload });
+    return result({ frameName, date, clientName, mode: modeUsed, nodeIds, upload });
   }
 
   const exportResult = await exportFigmaFrames({
@@ -124,7 +131,7 @@ export async function handleFullPipeline(input: FullPipelineInput) {
   });
 
   return result({
-    frameName: input.frameName,
+    frameName,
     date,
     clientName,
     mode: modeUsed,
