@@ -15,10 +15,8 @@
       },
       "category": "productivity",
       "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/milenacarneiro-art/stark-export-plugin.git",
-        "path": ".",
-        "ref": "main"
+        "source": "url",
+        "url": "https://github.com/milenacarneiro-art/stark-export-plugin.git"
       },
       "homepage": "https://github.com/milenacarneiro-art/stark-export-plugin"
     }
