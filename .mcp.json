@@ -1,13 +1,5 @@
 {
   "mcpServers": {
-    "clickup": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@mcptools/mcp-clickup"],
-      "env": {
-        "CLICKUP_API_TOKEN": "${CLICKUP_API_TOKEN}"
-      }
-    },
     "figma-drive": {
       "type": "stdio",
       "command": "node",

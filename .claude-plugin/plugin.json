@@ -18,7 +18,7 @@
   "mcpServers": {
     "clickup": {
       "required": true,
-      "description": "ClickUp MCP para comentar e atualizar status das tarefas."
+      "description": "ClickUp para comentar e atualizar status. Use o conector ClickUp já conectado no Claude Code (não vem com o plugin — conectar via /mcp ou pelas Configurações > Conectores)."
     },
     "figma-drive": {
       "required": true,

@@ -15,6 +15,7 @@ export interface UploadedFile {
   name: string;
   id: string;
   link: string;
+  action: 'uploaded' | 'updated' | 'skipped';
 }
 
 export interface UploadResult {
@@ -152,6 +153,23 @@ async function findOrCreateMonthFolder(
   return pasta;
 }
 
+async function findFileInFolder(
+  token: string,
+  name: string,
+  parentId: string,
+): Promise<{ id: string; size: number; webViewLink?: string } | null> {
+  const safeName = name.replace(/'/g, "\\'");
+  const data = await driveGet(token, '/files', {
+    q: `name = '${safeName}' and '${parentId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`,
+    fields: 'files(id, name, size, webViewLink)',
+    pageSize: '2',
+    supportsAllDrives: 'true',
+    includeItemsFromAllDrives: 'true',
+  });
+  const f = (data.files || [])[0];
+  return f ? { id: f.id, size: Number(f.size || 0), webViewLink: f.webViewLink } : null;
+}
+
 async function uploadFile(token: string, filePath: string, parentId: string): Promise<UploadedFile> {
   const fileName = basename(filePath);
   const ext = fileName.toLowerCase().split('.').pop();
@@ -164,20 +182,33 @@ async function uploadFile(token: string, filePath: string, parentId: string): Pr
 
   const size = statSync(filePath).size;
 
+  // Idempotência: arquivo já no Drive com mesmo nome e tamanho → não sobe de novo;
+  // mesmo nome e tamanho diferente → atualiza o conteúdo (sem criar duplicata)
+  const existing = await findFileInFolder(token, fileName, parentId);
+  if (existing && existing.size === size) {
+    return {
+      name: fileName,
+      id: existing.id,
+      link: existing.webViewLink || `https://drive.google.com/file/d/${existing.id}/view`,
+      action: 'skipped',
+    };
+  }
+
+  const initUrl = existing
+    ? `${DRIVE_UPLOAD_BASE}/files/${existing.id}?uploadType=resumable&supportsAllDrives=true&fields=id,name,webViewLink`
+    : `${DRIVE_UPLOAD_BASE}/files?uploadType=resumable&supportsAllDrives=true&fields=id,name,webViewLink`;
+
   // Upload resumable em 2 passos — suporta arquivos grandes (vídeos de Reels)
-  const initResp = await fetch(
-    `${DRIVE_UPLOAD_BASE}/files?uploadType=resumable&supportsAllDrives=true&fields=id,name,webViewLink`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json; charset=UTF-8',
-        'X-Upload-Content-Type': mimeType,
-        'X-Upload-Content-Length': String(size),
-      },
-      body: JSON.stringify({ name: fileName, parents: [parentId] }),
+  const initResp = await fetch(initUrl, {
+    method: existing ? 'PATCH' : 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json; charset=UTF-8',
+      'X-Upload-Content-Type': mimeType,
+      'X-Upload-Content-Length': String(size),
     },
-  );
+    body: JSON.stringify(existing ? { name: fileName } : { name: fileName, parents: [parentId] }),
+  });
   if (!initResp.ok) {
     throw new Error(`Erro ao iniciar upload de ${fileName} (${initResp.status}): ${await initResp.text()}`);
   }
@@ -198,6 +229,7 @@ async function uploadFile(token: string, filePath: string, parentId: string): Pr
     name: data.name,
     id: data.id,
     link: data.webViewLink || `https://drive.google.com/file/d/${data.id}/view`,
+    action: existing ? 'updated' : 'uploaded',
   };
 }
 

@@ -21512,24 +21512,43 @@ async function findOrCreateMonthFolder(token, mesNum, parentId, driveId, steps) 
   }
   return pasta;
 }
+async function findFileInFolder(token, name, parentId) {
+  const safeName = name.replace(/'/g, "\\'");
+  const data = await driveGet(token, "/files", {
+    q: `name = '${safeName}' and '${parentId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`,
+    fields: "files(id, name, size, webViewLink)",
+    pageSize: "2",
+    supportsAllDrives: "true",
+    includeItemsFromAllDrives: "true"
+  });
+  const f = (data.files || [])[0];
+  return f ? { id: f.id, size: Number(f.size || 0), webViewLink: f.webViewLink } : null;
+}
 async function uploadFile(token, filePath, parentId) {
   const fileName = basename(filePath);
   const ext = fileName.toLowerCase().split(".").pop();
   const mimeType = ext === "png" ? "image/png" : ext === "jpg" || ext === "jpeg" ? "image/jpeg" : ext === "mp4" ? "video/mp4" : ext === "mov" ? "video/quicktime" : "application/octet-stream";
   const size = statSync(filePath).size;
-  const initResp = await fetch(
-    `${DRIVE_UPLOAD_BASE}/files?uploadType=resumable&supportsAllDrives=true&fields=id,name,webViewLink`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json; charset=UTF-8",
-        "X-Upload-Content-Type": mimeType,
-        "X-Upload-Content-Length": String(size)
-      },
-      body: JSON.stringify({ name: fileName, parents: [parentId] })
-    }
-  );
+  const existing = await findFileInFolder(token, fileName, parentId);
+  if (existing && existing.size === size) {
+    return {
+      name: fileName,
+      id: existing.id,
+      link: existing.webViewLink || `https://drive.google.com/file/d/${existing.id}/view`,
+      action: "skipped"
+    };
+  }
+  const initUrl = existing ? `${DRIVE_UPLOAD_BASE}/files/${existing.id}?uploadType=resumable&supportsAllDrives=true&fields=id,name,webViewLink` : `${DRIVE_UPLOAD_BASE}/files?uploadType=resumable&supportsAllDrives=true&fields=id,name,webViewLink`;
+  const initResp = await fetch(initUrl, {
+    method: existing ? "PATCH" : "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "X-Upload-Content-Type": mimeType,
+      "X-Upload-Content-Length": String(size)
+    },
+    body: JSON.stringify(existing ? { name: fileName } : { name: fileName, parents: [parentId] })
+  });
   if (!initResp.ok) {
     throw new Error(`Erro ao iniciar upload de ${fileName} (${initResp.status}): ${await initResp.text()}`);
   }
@@ -21548,7 +21567,8 @@ async function uploadFile(token, filePath, parentId) {
   return {
     name: data.name,
     id: data.id,
-    link: data.webViewLink || `https://drive.google.com/file/d/${data.id}/view`
+    link: data.webViewLink || `https://drive.google.com/file/d/${data.id}/view`,
+    action: existing ? "updated" : "uploaded"
   };
 }
 async function navigateToDateFolder(token, clientName, dateStr, startFolderId, folderSuffix) {

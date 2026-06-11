@@ -17,3 +17,4 @@ clientes:
   # "Dr. Rodolfo Soares":
   #   drive_nome: "Dr. Rodolfo"            # nome exato da pasta no Drive (se diferente do frame)
   #   drive_pasta_ano_id: "1ABC...xyz"     # opcional — ID da pasta do ano para estrutura não-padrão
+  #   clickup_alias: "Rodolfo Soares"      # opcional — nome da subtarefa no ClickUp (se diferente do frame)

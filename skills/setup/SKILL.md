@@ -37,19 +37,21 @@ Configuração única. O servidor figma-drive já vem pronto no plugin (sem `npm
      ```
    - Token já existente no arquivo e usuário não quer trocar → manter.
 
-4. **ClickUp** — verificar se o MCP clickup está conectado (alguma tool `clickup_*` disponível).
-   - Não conectado → orientar: definir a variável de ambiente `CLICKUP_API_TOKEN` (ClickUp → Settings → Apps → API Token) e reiniciar o Claude Code.
+4. **ClickUp** — verificar se o MCP/conector ClickUp está conectado (alguma tool `clickup_*` disponível).
+   - Não conectado → orientar a conectar o conector ClickUp do Claude Code (`/mcp` ou Configurações → Conectores → ClickUp) — o mesmo que o resto do time já usa. Sem token manual.
 
 5. **Resumo** — exibir:
    ```
    ✅ stark-export configurado!
       credentials.json: ~/.stark-export/credentials.json
       Token Figma:      salvo
-      ClickUp:          [ok | configurar CLICKUP_API_TOKEN]
+      ClickUp:          [ok | conectar o conector ClickUp]
 
-   ⚠️ Reinicie o Claude Code para ativar o MCP figma-drive.
+   ⚠️ Se o MCP figma-drive ainda não aparecer, reinicie o Claude Code.
    Depois é só rodar: /stark-export:exportar [link do Figma]
    ```
+
+> O `/stark-export:exportar` roda este setup sozinho na primeira vez — não é obrigatório rodar antes.
 
 ## Verificação pós-restart (opcional)
 

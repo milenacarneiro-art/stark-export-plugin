@@ -29,15 +29,13 @@ Pelo canal da organização Stark no Claude Code (seção de plugins), ou via ma
 |---|---|
 | `credentials.json` | Pedir ao responsável pelo Drive da Stark (service account do Google) |
 | Token do Figma | figma.com → Settings → Security → Personal access tokens |
-| Token do ClickUp | ClickUp → Settings → Apps → API Token → definir como variável de ambiente `CLICKUP_API_TOKEN` |
+| Conector ClickUp | Conectar no Claude Code (`/mcp` ou Configurações → Conectores) — sem token manual |
 
-### 3. Rode o setup
+### 3. Use
 
-```
-/stark-export:setup
-```
+Não precisa rodar setup antes: na primeira vez que você rodar `/stark-export:exportar`, ele configura tudo sozinho (pergunta onde está o `credentials.json` e o token do Figma) e já segue para o export.
 
-Ele copia o `credentials.json`, salva o token do Figma e confere o ClickUp. Depois, **reinicie o Claude Code** — pronto.
+Se preferir configurar separado: `/stark-export:setup`.
 
 ---
 
@@ -53,8 +51,8 @@ A skill pergunta o nome do frame (ex: `09-06 - Dr. Álvaro Rodrigues`) e faz tud
 
 1. **Bia revisa a arte**: erros graves de gramática PT-BR e nudez. Reprovado → bloqueia só essa tarefa e mostra o problema (você escolhe: corrigir no Figma ou exportar mesmo assim)
 2. Exporta o frame como PNG (carrossel → 1 PNG por card, automático)
-3. Sobe no Drive em `Clientes / [cliente] / Cronograma de Conteúdo / Artes / [ano] / [mês] / [data]`
-4. Comenta o link da pasta na subtarefa do ClickUp
+3. Sobe no Drive em `Clientes / [cliente] / Cronograma de Conteúdo / Artes / [ano] / [mês] / [data]` — re-rodar é seguro: arquivo igual é pulado, arquivo alterado é substituído (nunca duplica)
+4. Comenta o link da pasta na subtarefa do ClickUp, com @ do responsável
 5. Muda o status para **ENVIO PENDENTE**
 
 **Se a Bia reprovar:** corrija no Figma e mande seguir — ela reverifica só o que foi reprovado e libera a exportação.
@@ -88,6 +86,7 @@ clientes:
   "Dr. Rodolfo Soares":
     drive_nome: "Dr. Rodolfo"          # nome exato da pasta no Drive
     drive_pasta_ano_id: "1ABC...xyz"   # ID da pasta do ano (estrutura não-padrão)
+    clickup_alias: "Rodolfo Soares"    # nome da subtarefa no ClickUp (se diferente do frame)
 ```
 
 ---
@@ -100,7 +99,7 @@ clientes:
 | `credentials nao encontrado` | Rode `/stark-export:setup` e informe onde está o credentials.json |
 | `Pasta do cliente nao encontrada` | Verifique o `drive_nome` em `config/clientes.yaml` ou peça para compartilhar a pasta Clientes com o service account |
 | Link sem `node-id` | Selecione o frame no Figma antes de copiar o link (Ctrl/Cmd+L) |
-| ClickUp não conecta | Defina a variável de ambiente `CLICKUP_API_TOKEN` e reinicie o Claude Code |
+| ClickUp não conecta | Conecte o conector ClickUp no Claude Code (`/mcp` ou Configurações → Conectores) |
 | figma-drive não aparece após setup | Reinicie o Claude Code (o MCP carrega na inicialização) |
 
 ---
