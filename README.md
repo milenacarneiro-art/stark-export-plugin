@@ -18,12 +18,16 @@ Baixe a versão LTS em [nodejs.org](https://nodejs.org) e instale (se já tiver,
 
 ### 2. Instale o plugin
 
-No Claude Code:
+Abra o **terminal** (PowerShell no Windows, Terminal no Mac) e rode:
 
 ```
-/plugin marketplace add milenacarneiro-art/stark-export-plugin
-/plugin install stark-export
+claude plugin marketplace add milenacarneiro-art/stark-export-plugin
+claude plugin install stark-export@stark-export
 ```
+
+Depois reinicie o Claude Code. O plugin vale para o usuário inteiro — funciona no terminal e no app desktop.
+
+> No Claude Code de terminal também dá para usar `/plugin marketplace add milenacarneiro-art/stark-export-plugin` + `/plugin install stark-export` direto na conversa. No app desktop o `/plugin` não existe — use o terminal como acima.
 
 ### 3. Conecte o ClickUp
 
