@@ -18,16 +18,26 @@ Baixe a versão LTS em [nodejs.org](https://nodejs.org) e instale (se já tiver,
 
 ### 2. Instale o plugin
 
-Abra o **terminal** (PowerShell no Windows, Terminal no Mac) e rode:
+**Pelo app desktop** (Windows/Mac):
+
+1. Clique no botão **+** ao lado da caixa de mensagem
+2. **Plugins** → **Add plugin**
+3. Adicione o marketplace `milenacarneiro-art/stark-export-plugin`
+4. Instale o **stark-export**
+5. Reinicie o Claude Code
+
+> O comando `/plugin` digitado no chat **não funciona no app desktop** ("isn't available in this environment") — use o menu **+ → Plugins** acima.
+
+**Pelo terminal** (quem tem o CLI instalado):
 
 ```
 claude plugin marketplace add milenacarneiro-art/stark-export-plugin
 claude plugin install stark-export@stark-export
 ```
 
-Depois reinicie o Claude Code. O plugin vale para o usuário inteiro — funciona no terminal e no app desktop.
+Ou, dentro do Claude Code de terminal: `/plugin marketplace add milenacarneiro-art/stark-export-plugin` + `/plugin install stark-export`.
 
-> No Claude Code de terminal também dá para usar `/plugin marketplace add milenacarneiro-art/stark-export-plugin` + `/plugin install stark-export` direto na conversa. No app desktop o `/plugin` não existe — use o terminal como acima.
+A instalação vale para o usuário inteiro — feita por qualquer um dos caminhos, o plugin funciona no app e no terminal.
 
 ### 3. Conecte o ClickUp
 
@@ -114,6 +124,7 @@ clientes:
 | `Pasta do cliente nao encontrada` | Verifique o `drive_nome` em `config/clientes.yaml` ou peça para compartilhar a pasta Clientes com o service account |
 | Link sem `node-id` | Selecione o frame no Figma antes de copiar o link (Ctrl/Cmd+L) |
 | ClickUp não conecta | Conecte o conector ClickUp no Claude Code (`/mcp` ou Configurações → Conectores) |
+| `/plugin isn't available in this environment` | Normal no app desktop — instale pelo menu **+ → Plugins** (ver passo 2) |
 | figma-drive não aparece após setup | Reinicie o Claude Code (o MCP carrega na inicialização) |
 
 ---
