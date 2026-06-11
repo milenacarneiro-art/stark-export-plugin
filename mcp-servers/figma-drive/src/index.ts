@@ -6,6 +6,7 @@ import { exportFigmaSchema, handleExportFigma } from './tools/export-figma.js';
 import { uploadDriveSchema, handleUploadDrive } from './tools/upload-drive.js';
 import { fullPipelineSchema, handleFullPipeline } from './tools/full-pipeline.js';
 import { inspectFrameSchema, handleInspectFrame } from './tools/inspect-frame.js';
+import { reviewFrameSchema, handleReviewFrame } from './tools/review-frame.js';
 
 const server = new McpServer({
   name: 'stark-figma-drive',
@@ -19,6 +20,14 @@ server.tool(
   'Use este tool como padrao para exportar agendas.',
   fullPipelineSchema.shape,
   async (input) => handleFullPipeline(input as any),
+);
+
+server.tool(
+  'review_figma_frame',
+  'Material de revisao de arte (Bia): extrai todos os textos do frame e retorna screenshot ' +
+  'de cada card via REST do Figma. Use ANTES de figma_to_drive para revisar gramatica e nudez.',
+  reviewFrameSchema.shape,
+  async (input) => handleReviewFrame(input as any),
 );
 
 server.tool(

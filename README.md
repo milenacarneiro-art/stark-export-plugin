@@ -5,7 +5,7 @@ Plugin Claude Code da Stark Marketing: exporta agendas do Figma para o Google Dr
 **Cole o link do frame → o plugin faz o resto:**
 
 ```
-Link do Figma → PNG (detecta carrossel sozinho) → pasta certa no Drive → comentário + status no ClickUp
+Link do Figma → revisão da Bia (gramática + nudez) → PNG (detecta carrossel sozinho) → pasta certa no Drive → comentário + status no ClickUp
 ```
 
 ---
@@ -51,10 +51,13 @@ Termine a arte no Figma, selecione o frame, copie o link (**Ctrl/Cmd+L**) e rode
 
 A skill pergunta o nome do frame (ex: `09-06 - Dr. Álvaro Rodrigues`) e faz tudo:
 
-1. Exporta o frame como PNG (carrossel → 1 PNG por card, automático)
-2. Sobe no Drive em `Clientes / [cliente] / Cronograma de Conteúdo / Artes / [ano] / [mês] / [data]`
-3. Comenta o link da pasta na subtarefa do ClickUp
-4. Muda o status para **ENVIO PENDENTE**
+1. **Bia revisa a arte**: erros graves de gramática PT-BR e nudez. Reprovado → bloqueia só essa tarefa e mostra o problema (você escolhe: corrigir no Figma ou exportar mesmo assim)
+2. Exporta o frame como PNG (carrossel → 1 PNG por card, automático)
+3. Sobe no Drive em `Clientes / [cliente] / Cronograma de Conteúdo / Artes / [ano] / [mês] / [data]`
+4. Comenta o link da pasta na subtarefa do ClickUp
+5. Muda o status para **ENVIO PENDENTE**
+
+**Se a Bia reprovar:** corrija no Figma e mande seguir — ela reverifica só o que foi reprovado e libera a exportação.
 
 **Vários de uma vez** — cole um link por linha (nome do frame opcional após `|`):
 

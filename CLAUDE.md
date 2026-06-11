@@ -1,6 +1,6 @@
 # stark-export — Plugin Context
 
-Plugin mínimo: link do Figma → PNG → Google Drive → comentário + status no ClickUp.
+Plugin mínimo: link do Figma → revisão da Bia (gramática + nudez) → PNG → Google Drive → comentário + status no ClickUp.
 
 ## Skills
 
@@ -16,6 +16,7 @@ Plugin mínimo: link do Figma → PNG → Google Drive → comentário + status 
 3. **Comentário antes do status** — `clickup_create_task_comment` é bloqueante; `clickup_update_task` só depois de confirmado, nunca em paralelo
 4. **Falha isolada** — 1 retry → logar → continuar a fila
 5. **Nunca AskUserQuestion** — perguntas em texto livre para não travar a fila
+6. **Bia REPROVADO** bloqueia **só essa tarefa** (gramática grave ou nudez) — as demais da fila seguem. Não é falha técnica, é decisão de qualidade. Review via tool `review_figma_frame` (REST), nunca via Figma MCP oficial
 
 ## Arquivos
 

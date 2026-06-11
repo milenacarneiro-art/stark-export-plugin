@@ -64,7 +64,7 @@ function parseFrameName(frameName: string): { date: string; clientName: string }
   return { date: normalizeDate(rawDate), clientName };
 }
 
-const CONTAINER_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP', 'SECTION']);
+export const CONTAINER_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP', 'SECTION']);
 
 export async function handleFullPipeline(input: FullPipelineInput) {
   const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);

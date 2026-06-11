@@ -80,6 +80,61 @@ export async function getFrameInfo(fileKey: string, nodeId: string): Promise<Fra
   return { nodeId: node.id, name: node.name, type: node.type, children };
 }
 
+export interface FrameText {
+  nodeId: string;
+  path: string;
+  characters: string;
+}
+
+/**
+ * Extrai todos os textos de um node e seus filhos (recursivo, via REST).
+ * Equivalente ao use_figma com JS recursivo, sem consumir o Figma MCP.
+ */
+export async function collectFrameTexts(fileKey: string, nodeId: string): Promise<{ name: string; texts: FrameText[] }> {
+  const token = getFigmaToken();
+  const id = nodeId.replace('-', ':');
+
+  const url = new URL(`${FIGMA_API_BASE}/files/${fileKey}/nodes`);
+  url.searchParams.set('ids', id);
+
+  const resp = await fetch(url.toString(), { headers: { 'X-Figma-Token': token } });
+  if (!resp.ok) {
+    throw new Error(`Figma API /nodes retornou ${resp.status}: ${await resp.text()}`);
+  }
+
+  const data = (await resp.json()) as any;
+  const root = data.nodes?.[id]?.document;
+  if (!root) {
+    throw new Error(`Node ${id} nao encontrado no arquivo ${fileKey}.`);
+  }
+
+  const texts: FrameText[] = [];
+  const walk = (node: any, path: string) => {
+    if (node.visible === false) return;
+    if (node.type === 'TEXT' && node.characters?.trim()) {
+      texts.push({ nodeId: node.id, path, characters: node.characters });
+    }
+    for (const child of node.children || []) {
+      walk(child, `${path} > ${child.name}`);
+    }
+  };
+  walk(root, root.name);
+
+  return { name: root.name, texts };
+}
+
+/** Renderiza um node como PNG e retorna o buffer (para revisão visual). */
+export async function renderNodePng(fileKey: string, nodeId: string, scale = 1): Promise<Buffer | null> {
+  const token = getFigmaToken();
+  const id = nodeId.replace('-', ':');
+  const images = await exportNodesBatch(token, fileKey, [id], scale);
+  const url = images?.[id];
+  if (!url) return null;
+  const resp = await fetch(url);
+  if (!resp.ok) return null;
+  return Buffer.from(await resp.arrayBuffer());
+}
+
 async function exportNodesBatch(
   token: string,
   fileKey: string,

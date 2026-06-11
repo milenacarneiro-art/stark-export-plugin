@@ -21214,6 +21214,43 @@ async function getFrameInfo(fileKey, nodeId) {
   })).sort((a, b) => a.y - b.y || a.x - b.x);
   return { nodeId: node.id, name: node.name, type: node.type, children };
 }
+async function collectFrameTexts(fileKey, nodeId) {
+  const token = getFigmaToken();
+  const id = nodeId.replace("-", ":");
+  const url = new URL(`${FIGMA_API_BASE}/files/${fileKey}/nodes`);
+  url.searchParams.set("ids", id);
+  const resp = await fetch(url.toString(), { headers: { "X-Figma-Token": token } });
+  if (!resp.ok) {
+    throw new Error(`Figma API /nodes retornou ${resp.status}: ${await resp.text()}`);
+  }
+  const data = await resp.json();
+  const root = data.nodes?.[id]?.document;
+  if (!root) {
+    throw new Error(`Node ${id} nao encontrado no arquivo ${fileKey}.`);
+  }
+  const texts = [];
+  const walk = (node, path) => {
+    if (node.visible === false) return;
+    if (node.type === "TEXT" && node.characters?.trim()) {
+      texts.push({ nodeId: node.id, path, characters: node.characters });
+    }
+    for (const child of node.children || []) {
+      walk(child, `${path} > ${child.name}`);
+    }
+  };
+  walk(root, root.name);
+  return { name: root.name, texts };
+}
+async function renderNodePng(fileKey, nodeId, scale = 1) {
+  const token = getFigmaToken();
+  const id = nodeId.replace("-", ":");
+  const images = await exportNodesBatch(token, fileKey, [id], scale);
+  const url = images?.[id];
+  if (!url) return null;
+  const resp = await fetch(url);
+  if (!resp.ok) return null;
+  return Buffer.from(await resp.arrayBuffer());
+}
 async function exportNodesBatch(token, fileKey, nodeIds, scale) {
   const url = new URL(`${FIGMA_API_BASE}/images/${fileKey}`);
   url.searchParams.set("ids", nodeIds.join(","));
@@ -21778,6 +21815,69 @@ async function handleInspectFrame(input) {
   };
 }
 
+// src/tools/review-frame.ts
+var reviewFrameSchema = external_exports.object({
+  figmaUrl: external_exports.string().describe("Link do frame no Figma (com node-id na URL)"),
+  mode: external_exports.enum(["auto", "single", "carrossel"]).optional().default("auto").describe(
+    "single: revisa o frame inteiro. carrossel: revisa cada card filho. auto: detecta sozinho."
+  ),
+  nodeIds: external_exports.array(external_exports.string()).optional().describe(
+    "Revisar apenas estes nodes (ex: reverificacao pontual apos correcao). Ignora mode."
+  ),
+  includeImages: external_exports.boolean().optional().default(true).describe(
+    "Se false, retorna so os textos (mais leve \u2014 util para reverificar gramatica apos correcao)."
+  ),
+  scale: external_exports.number().optional().default(1).describe("Escala das imagens de revisao (default: 1)")
+});
+async function handleReviewFrame(input) {
+  const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);
+  let targets;
+  if (input.nodeIds?.length) {
+    targets = input.nodeIds.map((n) => ({ nodeId: n.replace("-", ":"), label: n }));
+  } else if (input.mode === "single") {
+    targets = [{ nodeId, label: "frame" }];
+  } else {
+    const info = await getFrameInfo(fileKey, nodeId);
+    const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
+    const isCarrossel = input.mode === "carrossel" || input.mode === "auto" && cards.length >= 2;
+    targets = isCarrossel && cards.length > 0 ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, "0")} \u2014 ${c.name}` })) : [{ nodeId: info.nodeId, label: info.name }];
+  }
+  const content = [];
+  const summary = [];
+  const warnings = [];
+  for (const target of targets) {
+    let texts = [];
+    try {
+      const result2 = await collectFrameTexts(fileKey, target.nodeId);
+      texts = result2.texts;
+    } catch (err) {
+      warnings.push(`sem textos extraidos de ${target.label}: ${err.message}`);
+    }
+    summary.push({ nodeId: target.nodeId, frame: target.label, texts });
+  }
+  content.push({
+    type: "text",
+    text: JSON.stringify({
+      fileKey,
+      frames_verificados: targets.length,
+      textos: summary,
+      avisos: warnings,
+      nota: "Analise os textos (gramatica PT-BR grave) e as imagens abaixo (nudez). As imagens seguem na mesma ordem dos frames listados."
+    }, null, 2)
+  });
+  if (input.includeImages) {
+    for (const target of targets) {
+      const png = await renderNodePng(fileKey, target.nodeId, input.scale);
+      if (png) {
+        content.push({ type: "image", data: png.toString("base64"), mimeType: "image/png" });
+      } else {
+        content.push({ type: "text", text: `\u26A0\uFE0F screenshot indisponivel para ${target.label} (${target.nodeId})` });
+      }
+    }
+  }
+  return { content };
+}
+
 // src/index.ts
 var server = new McpServer({
   name: "stark-figma-drive",
@@ -21788,6 +21888,12 @@ server.tool(
   "Pipeline completo em 1 chamada: recebe o link do frame no Figma, exporta como PNG (detecta carrossel automaticamente) e sobe na pasta certa do Drive do cliente. Use este tool como padrao para exportar agendas.",
   fullPipelineSchema.shape,
   async (input) => handleFullPipeline(input)
+);
+server.tool(
+  "review_figma_frame",
+  "Material de revisao de arte (Bia): extrai todos os textos do frame e retorna screenshot de cada card via REST do Figma. Use ANTES de figma_to_drive para revisar gramatica e nudez.",
+  reviewFrameSchema.shape,
+  async (input) => handleReviewFrame(input)
 );
 server.tool(
   "inspect_figma_frame",
