@@ -1,0 +1,19 @@
+# clientes.yaml — Mapeamento Drive/ClickUp por cliente
+#
+# Só é preciso adicionar um cliente aqui se:
+#   - o nome da pasta no Drive for diferente do nome no frame do Figma, OU
+#   - o cliente tiver estrutura não-padrão no Drive (usar drive_pasta_ano_id)
+#
+# Clientes fora desta lista funcionam normalmente: o nome parseado do frame
+# ([DATA] - [Nome]) é usado como nome da pasta no Drive.
+
+# Lista do ClickUp onde estão as tarefas de agenda
+clickup_list_id: "901324888130"
+
+# Status aplicado após o export
+clickup_status_final: "ENVIO PENDENTE"
+
+clientes:
+  # "Dr. Rodolfo Soares":
+  #   drive_nome: "Dr. Rodolfo"            # nome exato da pasta no Drive (se diferente do frame)
+  #   drive_pasta_ano_id: "1ABC...xyz"     # opcional — ID da pasta do ano para estrutura não-padrão

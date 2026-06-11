@@ -1,0 +1,12 @@
+# dependências de desenvolvimento do MCP server — dist/ é commitado de propósito
+mcp-servers/figma-drive/node_modules/
+
+# credenciais nunca entram no repo
+credentials.json
+*.credentials.json
+.env
+
+# locais
+.claude/settings.local.json
+Thumbs.db
+.DS_Store

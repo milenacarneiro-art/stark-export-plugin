@@ -1,0 +1,26 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "stark-export",
+  "description": "Plugins de automação de design da Stark Marketing",
+  "owner": {
+    "name": "Stark Marketing",
+    "email": "designer@starkmkt.com"
+  },
+  "plugins": [
+    {
+      "name": "stark-export",
+      "description": "Exporta agendas do Figma para o Google Drive e notifica pelo ClickUp. Cole o link do frame, o resto é automático.",
+      "author": {
+        "name": "Stark Marketing"
+      },
+      "category": "productivity",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/milenacarneiro-art/stark-export-plugin.git",
+        "path": ".",
+        "ref": "main"
+      },
+      "homepage": "https://github.com/milenacarneiro-art/stark-export-plugin"
+    }
+  ]
+}

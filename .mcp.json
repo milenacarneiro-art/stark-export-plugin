@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "clickup": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@mcptools/mcp-clickup"],
+      "env": {
+        "CLICKUP_API_TOKEN": "${CLICKUP_API_TOKEN}"
+      }
+    },
+    "figma-drive": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-servers/figma-drive/dist/index.js"]
+    }
+  }
+}
