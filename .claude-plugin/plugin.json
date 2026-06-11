@@ -1,28 +1,10 @@
 {
   "name": "stark-export",
-  "version": "1.0.0",
-  "description": "Exporta agendas do Figma para o Google Drive e notifica pelo ClickUp. Cole o link do frame, o resto é automático.",
-  "author": "Stark Marketing <designer@starkmkt.com>",
-
-  "skills": [
-    {
-      "name": "exportar",
-      "path": "skills/exportar/SKILL.md"
-    },
-    {
-      "name": "setup",
-      "path": "skills/setup/SKILL.md"
-    }
-  ],
-
-  "mcpServers": {
-    "clickup": {
-      "required": true,
-      "description": "ClickUp para comentar e atualizar status. Use o conector ClickUp já conectado no Claude Code (não vem com o plugin — conectar via /mcp ou pelas Configurações > Conectores)."
-    },
-    "figma-drive": {
-      "required": true,
-      "description": "Servidor embutido no plugin (sem instalação). Exporta frames do Figma e sobe no Drive. Requer credentials.json e token do Figma — configure com /stark-export:setup."
-    }
-  }
+  "version": "1.0.1",
+  "description": "Exporta agendas do Figma para o Google Drive e notifica pelo ClickUp. Cole o link do frame, o resto é automático. Requer o conector ClickUp conectado (/mcp) e /stark-export:setup na primeira vez.",
+  "author": {
+    "name": "Stark Marketing",
+    "email": "designer@starkmkt.com"
+  },
+  "mcpServers": "./.mcp.json"
 }
