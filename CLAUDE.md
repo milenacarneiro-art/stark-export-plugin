@@ -47,3 +47,21 @@ npm run build        # gera dist/index.js bundled — COMMITAR o dist
 ```
 
 O `dist/index.js` é commitado de propósito: o time instala o plugin sem npm install.
+
+## Release — bump de versão obrigatório
+
+O time instala/atualiza pelo plugin manager (`claude plugin update`), que compara a
+**versão** em `.claude-plugin/plugin.json`. **Todo fix que o time precisa receber exige
+subir a versão** — sem bump, o update vê "já na última" e ninguém recebe o fix.
+
+Guardrail: o hook `pre-push` (`.githooks/pre-push` → `scripts/check-version-bump.mjs`)
+bloqueia push de mudança *shippable* (skills/, mcp-servers/, hooks/, config/, .mcp.json,
+.claude-plugin/) sem bump. Mudança só de docs passa direto.
+
+```
+git config core.hooksPath .githooks   # uma vez por clone, ativa o hook
+SKIP_VERSION_CHECK=1 git push          # bypass intencional (não precisa de release)
+```
+
+Fluxo de release: bumpar `plugin.json` (+ rodapé do README) → commitar → push → avisar
+o time pra rodar `docs/atualizar-plugin.md`.

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Guardrail de release: bloqueia push de mudanca shippable sem bump de versao.
+# Ativado por: git config core.hooksPath .githooks  (rode uma vez por clone)
+exec node scripts/check-version-bump.mjs
