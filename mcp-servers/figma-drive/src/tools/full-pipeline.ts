@@ -78,6 +78,10 @@ export const CONTAINER_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP
  *   2. cada slide preenche o frame-pai em um eixo — lado a lado (altura ≈
  *      altura do pai) ou empilhados (largura ≈ largura do pai). Elementos
  *      internos de um card sao menores que o pai nos dois eixos.
+ *   3. slides ficam lado a lado SEM se sobrepor. Camadas full-bleed empilhadas
+ *      de um card estatico (fundo + texto) tambem sao uniformes e cobrem o pai,
+ *      mas se sobrepoem — e seriam picotadas. Por isso exigimos que a area do
+ *      bounding-box que engloba os cards ≈ soma das areas (sem sobreposicao).
  */
 export function detectCarrosselCards(parent: FrameInfo): FrameChild[] | null {
   const cards = parent.children.filter((c) => CONTAINER_TYPES.has(c.type));
@@ -99,6 +103,16 @@ export function detectCarrosselCards(parent: FrameInfo): FrameChild[] | null {
       (parent.height > 0 && c.height >= parent.height * 0.95)
   );
   if (!spansParent) return null;
+
+  // slides nao se sobrepoem → bounding-box que os engloba ≈ soma das areas.
+  // Empilhados (sobrepostos) → bbox << soma → rejeita (trata como card unico).
+  const minX = Math.min(...cards.map((c) => c.x));
+  const minY = Math.min(...cards.map((c) => c.y));
+  const maxX = Math.max(...cards.map((c) => c.x + c.width));
+  const maxY = Math.max(...cards.map((c) => c.y + c.height));
+  const bboxArea = (maxX - minX) * (maxY - minY);
+  const sumArea = cards.reduce((acc, c) => acc + c.width * c.height, 0);
+  if (bboxArea < sumArea * 0.9) return null;
 
   return cards;
 }

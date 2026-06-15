@@ -21783,6 +21783,13 @@ function detectCarrosselCards(parent) {
     (c) => parent.width > 0 && c.width >= parent.width * 0.95 || parent.height > 0 && c.height >= parent.height * 0.95
   );
   if (!spansParent) return null;
+  const minX = Math.min(...cards.map((c) => c.x));
+  const minY = Math.min(...cards.map((c) => c.y));
+  const maxX = Math.max(...cards.map((c) => c.x + c.width));
+  const maxY = Math.max(...cards.map((c) => c.y + c.height));
+  const bboxArea = (maxX - minX) * (maxY - minY);
+  const sumArea = cards.reduce((acc, c) => acc + c.width * c.height, 0);
+  if (bboxArea < sumArea * 0.9) return null;
   return cards;
 }
 async function handleFullPipeline(input) {
