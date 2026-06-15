@@ -101,6 +101,14 @@ Datas aceitas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`. É desse nome que saem o cli
 
 ---
 
+## Atualizar o plugin
+
+Saiu correção nova? Cole o prompt pronto de [docs/atualizar-plugin.md](docs/atualizar-plugin.md)
+no chat do Claude Code — ele refresca o marketplace, atualiza o plugin e te lembra de reiniciar.
+Quem instalou pelo app desktop atualiza pelo menu **+ → Plugins → stark-export → Update**.
+
+---
+
 ## Configuração por cliente (opcional)
 
 Só necessário se o nome da pasta no Drive for diferente do nome no frame, ou se o cliente tiver estrutura não-padrão. Edite [config/clientes.yaml](config/clientes.yaml):
@@ -129,4 +137,4 @@ clientes:
 
 ---
 
-*Stark Marketing · stark-export v1.0.0 · designer@starkmkt.com*
+*Stark Marketing · stark-export v1.1.0 · designer@starkmkt.com*
