@@ -1,68 +1,60 @@
 # Atualizar o stark-export para a última versão
 
-Saiu correção nova (avisada no grupo)? Atualize seu clone local do plugin.
+Saiu correção nova (avisada no grupo)? Você instalou o plugin colando o link do
+GitHub no chat e pedindo pra instalar — atualizar é o mesmo caminho, pelo chat.
 **Copie o bloco abaixo e cole no chat do Claude Code** — ele faz o resto:
 
 ---
 
 ```
-Atualiza meu repo local do stark-export-plugin pra última versão do main no GitHub.
+Atualiza meu plugin stark-export pra última versão que está no GitHub.
 
-Repo: https://github.com/milenacarneiro-art/stark-export-plugin
+Marketplace: stark-export  (repo milenacarneiro-art/stark-export-plugin)
 
 Faz o seguinte, me mostrando a saída de cada passo:
 
-1. Acha a pasta do repo local — provavelmente uma pasta tipo "stark-export-plugin"
-   ou "stark-export" no meu computador. Se não achar, me pergunta onde está. Entra nela.
+1. Confere se o CLI do Claude Code está disponível: roda `claude --version`.
+   Se NÃO estiver (comando não encontrado), me avisa e para — sem o CLI não dá
+   pra atualizar pelo chat; me chama que a gente resolve junto.
 
-2. Confere que é o repo certo: roda `git remote -v` — tem que apontar pra
-   milenacarneiro-art/stark-export-plugin. Se não for, me avisa e para.
+2. Refresca o marketplace (puxa a última versão do GitHub):
+   claude plugin marketplace update stark-export
 
-3. Salva qualquer mudança local em arquivos versionados (ex: se eu mexi no
-   config/clientes.yaml): roda `git stash`. Meu config pessoal (token do Figma e
-   credentials.json) fica em ~/.stark-export/, fora do repo, então não corre risco.
+3. Atualiza o plugin:
+   claude plugin update stark-export@stark-export
 
-4. Garante que tô na branch main:
-   git checkout main
+4. Confirma a versão instalada:
+   claude plugin list
+   — a linha do stark-export tem que mostrar 1.1.0 ou maior.
 
-5. Puxa a última versão:
-   git fetch origin
-   git pull origin main
+5. Me lembra de REINICIAR o Claude Code pra aplicar — o MCP figma-drive e os
+   hooks só recarregam na inicialização.
 
-6. Se rodou git stash no passo 3, mostra `git stash list` e me pergunta se eu quero
-   recuperar (`git stash pop`) ou descartar.
-
-7. Confirma que atualizou: roda `git log --oneline -3` e me mostra a versão em
-   .claude-plugin/plugin.json — tem que estar em 1.1.0 ou maior.
-
-8. NÃO precisa rodar npm install nem build — o dist/ já vem pronto no repo.
-
-9. Me lembra de REINICIAR o Claude Code pra aplicar: o MCP figma-drive e os hooks
-   só recarregam na inicialização.
-
-10. Depois que eu reiniciar, se aparecer um aviso de que o stark-export não está
-    configurado, é só rodar /stark-export:setup uma vez. Se já estava configurado,
-    não preciso fazer nada.
+6. Depois que eu reiniciar: se aparecer um aviso de que o stark-export não está
+   configurado, é só rodar /stark-export:setup uma vez. Se já estava configurado,
+   não preciso fazer nada — minhas credenciais ficam em ~/.stark-export/ e não são
+   tocadas pela atualização.
 ```
 
 ---
 
 ## Por que esses passos
 
-- **`git stash` antes do pull:** se você editou algum arquivo versionado (ex:
-  `config/clientes.yaml`), o stash guarda sua mudança pra não dar conflito no pull.
-  No Windows é comum o git acusar arquivos "modificados" só por causa de quebra de
-  linha (CRLF) — o stash resolve isso também.
-- **`dist/` já vem pronto:** o servidor MCP é commitado já buildado, então não precisa
-  de `npm install` nem `npm run build`. Só puxar e reiniciar.
-- **Restart obrigatório:** o MCP `figma-drive` e os hooks carregam só na inicialização
-  do Claude Code.
+- **`marketplace update` antes do `plugin update`:** quando você instalou pelo link, o
+  Claude Code guardou uma cópia local do repo (em `~/.claude/plugins/`). O
+  `marketplace update` puxa os commits novos do GitHub pra essa cópia; sem isso, o
+  `plugin update` não enxerga a versão nova.
+- **Confirmar a versão (1.1.0+):** cada correção entregue ao time sobe o número da
+  versão no `plugin.json`. Se o `claude plugin list` ainda mostra a versão antiga, o
+  update não pegou — repita o passo 2 e 3.
+- **Restart obrigatório:** o MCP `figma-drive` e os hooks carregam só na inicialização.
 - **Suas credenciais não somem:** ficam em `~/.stark-export/` (token Figma + Google),
-  fora da pasta do repo. Atualizar não mexe nelas.
+  fora da pasta do plugin. Atualizar não mexe nelas.
 
 ## Se as mudanças não aparecerem depois de reiniciar
 
-- Confirme que o `git pull` rodou na pasta **certa** — a mesma que você apontou quando
-  instalou o plugin no Claude Code (não outro clone perdido em Downloads).
 - Confirme que reiniciou o Claude Code **por completo** (fechar e abrir de novo).
-- `git log --oneline -1` na pasta tem que mostrar o commit mais recente do `main`.
+- Rode `claude plugin list` e veja se a versão é a esperada. Se não for, rode de novo:
+  `claude plugin marketplace update stark-export` e `claude plugin update stark-export@stark-export`.
+- Persistindo, me chama — pode ser preciso remover e reinstalar
+  (`claude plugin uninstall stark-export@stark-export` e instalar de novo pelo link).

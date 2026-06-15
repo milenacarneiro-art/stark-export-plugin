@@ -18,26 +18,23 @@ Baixe a versão LTS em [nodejs.org](https://nodejs.org) e instale (se já tiver,
 
 ### 2. Instale o plugin
 
-**Pelo app desktop** (Windows/Mac):
-
-1. Clique no botão **+** ao lado da caixa de mensagem
-2. **Plugins** → **Add plugin**
-3. Adicione o marketplace `milenacarneiro-art/stark-export-plugin`
-4. Instale o **stark-export**
-5. Reinicie o Claude Code
-
-> O comando `/plugin` digitado no chat **não funciona no app desktop** ("isn't available in this environment") — use o menu **+ → Plugins** acima.
-
-**Pelo terminal** (quem tem o CLI instalado):
+**Cole o link do repositório no chat do Claude Code e peça pra instalar:**
 
 ```
-claude plugin marketplace add milenacarneiro-art/stark-export-plugin
-claude plugin install stark-export@stark-export
+Instala esse plugin pra mim: https://github.com/milenacarneiro-art/stark-export-plugin
 ```
 
-Ou, dentro do Claude Code de terminal: `/plugin marketplace add milenacarneiro-art/stark-export-plugin` + `/plugin install stark-export`.
+O Claude adiciona o marketplace e instala (clona o repo pra `~/.claude/plugins/`).
+Ao final, **reinicie o Claude Code**.
 
-A instalação vale para o usuário inteiro — feita por qualquer um dos caminhos, o plugin funciona no app e no terminal.
+> Equivalente pelo terminal, se preferir digitar:
+> ```
+> claude plugin marketplace add milenacarneiro-art/stark-export-plugin
+> claude plugin install stark-export@stark-export
+> ```
+
+A instalação vale pro usuário inteiro — funciona no app e no terminal. Para atualizar
+depois, veja [docs/atualizar-plugin.md](docs/atualizar-plugin.md).
 
 ### 3. Conecte o ClickUp
 
@@ -104,7 +101,7 @@ Datas aceitas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`. É desse nome que saem o cli
 ## Atualizar o plugin
 
 Saiu correção nova? Cole o prompt pronto de [docs/atualizar-plugin.md](docs/atualizar-plugin.md)
-no chat do Claude Code — ele dá `git pull` no seu clone local, confirma a versão e te lembra
+no chat do Claude Code — ele puxa a última versão do GitHub, confirma a versão e te lembra
 de reiniciar.
 
 ---
