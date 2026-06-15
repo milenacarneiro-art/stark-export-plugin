@@ -105,8 +105,7 @@ Datas aceitas: `DD-MM`, `DD-MM-AA` ou `YYYY-MM-DD`. É desse nome que saem o cli
 
 Saiu correção nova? Cole o prompt pronto de [docs/atualizar-plugin.md](docs/atualizar-plugin.md)
 no chat do Claude Code — ele dá `git pull` no seu clone local, confirma a versão e te lembra
-de reiniciar. (Quem instalou pelo gerenciador de plugins em vez de clone git: o mesmo doc tem
-o caminho alternativo no rodapé.)
+de reiniciar.
 
 ---
 

@@ -62,12 +62,7 @@ Faz o seguinte, me mostrando a saída de cada passo:
 
 ## Se as mudanças não aparecerem depois de reiniciar
 
-Você pode ter instalado pelo **gerenciador de plugins** (marketplace) em vez de clone
-git. Nesse caso, no chat do Claude Code:
-
-```
-claude plugin marketplace update stark-export
-claude plugin update stark-export@stark-export
-```
-
-e reinicie. No app desktop sem CLI: menu **+ → Plugins → stark-export → Update**.
+- Confirme que o `git pull` rodou na pasta **certa** — a mesma que você apontou quando
+  instalou o plugin no Claude Code (não outro clone perdido em Downloads).
+- Confirme que reiniciou o Claude Code **por completo** (fechar e abrir de novo).
+- `git log --oneline -1` na pasta tem que mostrar o commit mais recente do `main`.
