@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { getFrameInfo, collectFrameTexts, renderNodePng } from '../services/figma-api.js';
-import { parseFigmaUrl, CONTAINER_TYPES } from './full-pipeline.js';
+import { getFrameInfo, collectFrameTexts, renderNodePng, type FrameChild } from '../services/figma-api.js';
+import { parseFigmaUrl, CONTAINER_TYPES, detectCarrosselCards } from './full-pipeline.js';
 
 export const reviewFrameSchema = z.object({
   figmaUrl: z.string().describe('Link do frame no Figma (com node-id na URL)'),
@@ -33,9 +33,16 @@ export async function handleReviewFrame(input: ReviewFrameInput) {
   } else {
     const info = await getFrameInfo(fileKey, nodeId);
     frameName = info.name;
-    const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
-    const isCarrossel = input.mode === 'carrossel' || (input.mode === 'auto' && cards.length >= 2);
-    targets = input.mode !== 'single' && isCarrossel && cards.length > 0
+
+    // Mesma decisão do full-pipeline — revisar o que será exportado.
+    let cards: FrameChild[] | null = null;
+    if (input.mode === 'carrossel') {
+      const containers = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
+      cards = containers.length > 0 ? containers : null;
+    } else if (input.mode === 'auto') {
+      cards = detectCarrosselCards(info);
+    }
+    targets = cards
       ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, '0')} — ${c.name}` }))
       : [{ nodeId: info.nodeId, label: info.name }];
   }

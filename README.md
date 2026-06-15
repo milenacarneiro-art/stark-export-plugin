@@ -134,4 +134,4 @@ clientes:
 
 ---
 
-*Stark Marketing · stark-export v1.1.0 · designer@starkmkt.com*
+*Stark Marketing · stark-export v1.1.1 · designer@starkmkt.com*

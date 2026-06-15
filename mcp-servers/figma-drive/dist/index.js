@@ -21891,9 +21891,14 @@ async function handleReviewFrame(input) {
   } else {
     const info = await getFrameInfo(fileKey, nodeId);
     frameName = info.name;
-    const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
-    const isCarrossel = input.mode === "carrossel" || input.mode === "auto" && cards.length >= 2;
-    targets = input.mode !== "single" && isCarrossel && cards.length > 0 ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, "0")} \u2014 ${c.name}` })) : [{ nodeId: info.nodeId, label: info.name }];
+    let cards = null;
+    if (input.mode === "carrossel") {
+      const containers = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
+      cards = containers.length > 0 ? containers : null;
+    } else if (input.mode === "auto") {
+      cards = detectCarrosselCards(info);
+    }
+    targets = cards ? cards.map((c, i) => ({ nodeId: c.nodeId, label: `card ${String(i + 1).padStart(2, "0")} \u2014 ${c.name}` })) : [{ nodeId: info.nodeId, label: info.name }];
   }
   const content = [];
   const summary = [];

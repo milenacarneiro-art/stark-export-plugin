@@ -90,7 +90,7 @@ figma_to_drive({
 })
 ```
 
-- Passar o **mesmo `mode`** que a revisão da Bia usou (a contagem de cards do review indica: 2+ cards = `"carrossel"`, senão `"single"`) — garante que o que foi revisado é o que será exportado.
+- **Sempre `mode: "auto"`** — `review_figma_frame` e `figma_to_drive` compartilham a mesma detecção de carrossel, então o que foi revisado é exatamente o que será exportado. **Não** traduzir a contagem de cards da revisão para `mode` explícito: `carrossel` explícito pula a detecção e pode picotar um card estático.
 - `--dry-run` no input → passar `dryRun: true` (só valida a navegação do Drive, pula Bia, ClickUp e upload).
 - O retorno informa `mode` usado e `upload.folderLink`. Se a detecção parecer errada (ex: estático exportado como carrossel), reexecutar com `mode` explícito.
 - **Re-rodar é seguro**: arquivo já no Drive com mesmo nome e tamanho → `action: "skipped"`; tamanho diferente → `action: "updated"` (substitui, sem duplicar). Refletir isso no resumo.
