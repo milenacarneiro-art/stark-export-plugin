@@ -21210,9 +21210,18 @@ async function getFrameInfo(fileKey, nodeId) {
     name: c.name,
     type: c.type,
     x: c.absoluteBoundingBox?.x ?? 0,
-    y: c.absoluteBoundingBox?.y ?? 0
+    y: c.absoluteBoundingBox?.y ?? 0,
+    width: c.absoluteBoundingBox?.width ?? 0,
+    height: c.absoluteBoundingBox?.height ?? 0
   })).sort((a, b) => a.y - b.y || a.x - b.x);
-  return { nodeId: node.id, name: node.name, type: node.type, children };
+  return {
+    nodeId: node.id,
+    name: node.name,
+    type: node.type,
+    width: node.absoluteBoundingBox?.width ?? 0,
+    height: node.absoluteBoundingBox?.height ?? 0,
+    children
+  };
 }
 async function collectFrameTexts(fileKey, nodeId) {
   const token = getFigmaToken();
@@ -21759,6 +21768,23 @@ function parseFrameName(frameName) {
   return { date: normalizeDate(rawDate), clientName };
 }
 var CONTAINER_TYPES = /* @__PURE__ */ new Set(["FRAME", "COMPONENT", "INSTANCE", "GROUP", "SECTION"]);
+function detectCarrosselCards(parent) {
+  const cards = parent.children.filter((c) => CONTAINER_TYPES.has(c.type));
+  if (cards.length < 2) return null;
+  const widths = cards.map((c) => c.width);
+  const heights = cards.map((c) => c.height);
+  const uniform = (vals) => {
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return min > 0 && max <= min * 1.02;
+  };
+  if (!uniform(widths) || !uniform(heights)) return null;
+  const spansParent = cards.every(
+    (c) => parent.width > 0 && c.width >= parent.width * 0.95 || parent.height > 0 && c.height >= parent.height * 0.95
+  );
+  if (!spansParent) return null;
+  return cards;
+}
 async function handleFullPipeline(input) {
   const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);
   let nodeIds = [nodeId];
@@ -21767,13 +21793,16 @@ async function handleFullPipeline(input) {
   if (input.mode !== "single" || !frameName) {
     const info = await getFrameInfo(fileKey, nodeId);
     if (!frameName) frameName = info.name;
-    if (input.mode !== "single") {
+    if (input.mode === "carrossel") {
       const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
-      const isCarrossel = input.mode === "carrossel" || input.mode === "auto" && cards.length >= 2;
-      if (isCarrossel) {
-        if (cards.length === 0) {
-          throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
-        }
+      if (cards.length === 0) {
+        throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
+      }
+      nodeIds = cards.map((c) => c.nodeId);
+      modeUsed = `carrossel (${cards.length} cards)`;
+    } else if (input.mode === "auto") {
+      const cards = detectCarrosselCards(info);
+      if (cards) {
         nodeIds = cards.map((c) => c.nodeId);
         modeUsed = `carrossel (${cards.length} cards)`;
       }

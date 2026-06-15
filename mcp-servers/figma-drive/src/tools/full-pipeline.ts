@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { exportFigmaFrames, getFrameInfo } from '../services/figma-api.js';
+import { exportFigmaFrames, getFrameInfo, type FrameChild, type FrameInfo } from '../services/figma-api.js';
 import { uploadToDrive } from '../services/drive-api.js';
 import { normalizeDate } from '../utils/constants.js';
 
@@ -67,6 +67,42 @@ function parseFrameName(frameName: string): { date: string; clientName: string }
 
 export const CONTAINER_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP', 'SECTION']);
 
+/**
+ * Decide se os filhos de um frame sao slides de carrossel — nao apenas
+ * elementos internos de um card estatico (logo, texto, fundo).
+ *
+ * Contagem ("2+ filhos") sozinha gera falso positivo: card estatico tipico
+ * tem varios grupos dentro e cada um seria exportado como "slide" recortado
+ * e transparente. Slides reais de carrossel tem assinatura geometrica:
+ *   1. dimensoes uniformes entre si (mesma largura E altura);
+ *   2. cada slide preenche o frame-pai em um eixo — lado a lado (altura ≈
+ *      altura do pai) ou empilhados (largura ≈ largura do pai). Elementos
+ *      internos de um card sao menores que o pai nos dois eixos.
+ */
+export function detectCarrosselCards(parent: FrameInfo): FrameChild[] | null {
+  const cards = parent.children.filter((c) => CONTAINER_TYPES.has(c.type));
+  if (cards.length < 2) return null;
+
+  const widths = cards.map((c) => c.width);
+  const heights = cards.map((c) => c.height);
+  const uniform = (vals: number[]) => {
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return min > 0 && max <= min * 1.02; // ate 2% de variacao
+  };
+  if (!uniform(widths) || !uniform(heights)) return null;
+
+  // cada card cobre o pai em pelo menos um eixo (≥95%)
+  const spansParent = cards.every(
+    (c) =>
+      (parent.width > 0 && c.width >= parent.width * 0.95) ||
+      (parent.height > 0 && c.height >= parent.height * 0.95)
+  );
+  if (!spansParent) return null;
+
+  return cards;
+}
+
 export async function handleFullPipeline(input: FullPipelineInput) {
   const { fileKey, nodeId } = parseFigmaUrl(input.figmaUrl);
 
@@ -78,16 +114,21 @@ export async function handleFullPipeline(input: FullPipelineInput) {
   if (input.mode !== 'single' || !frameName) {
     const info = await getFrameInfo(fileKey, nodeId);
     if (!frameName) frameName = info.name;
-    if (input.mode !== 'single') {
+    if (input.mode === 'carrossel') {
+      // Forcado pelo usuario: exporta todos os filhos container, sem heuristica.
       const cards = info.children.filter((c) => CONTAINER_TYPES.has(c.type));
-      const isCarrossel = input.mode === 'carrossel' || (input.mode === 'auto' && cards.length >= 2);
-      if (isCarrossel) {
-        if (cards.length === 0) {
-          throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
-        }
+      if (cards.length === 0) {
+        throw new Error(`Frame "${info.name}" nao tem cards filhos para exportar como carrossel.`);
+      }
+      nodeIds = cards.map((c) => c.nodeId);
+      modeUsed = `carrossel (${cards.length} cards)`;
+    } else if (input.mode === 'auto') {
+      const cards = detectCarrosselCards(info);
+      if (cards) {
         nodeIds = cards.map((c) => c.nodeId);
         modeUsed = `carrossel (${cards.length} cards)`;
       }
+      // sem cards uniformes que preenchem o pai → card estatico (single)
     }
   }
 

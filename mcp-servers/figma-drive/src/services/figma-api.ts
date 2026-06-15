@@ -29,12 +29,16 @@ export interface FrameChild {
   type: string;
   x: number;
   y: number;
+  width: number;
+  height: number;
 }
 
 export interface FrameInfo {
   nodeId: string;
   name: string;
   type: string;
+  width: number;
+  height: number;
   children: FrameChild[];
 }
 
@@ -74,10 +78,19 @@ export async function getFrameInfo(fileKey: string, nodeId: string): Promise<Fra
       type: c.type,
       x: c.absoluteBoundingBox?.x ?? 0,
       y: c.absoluteBoundingBox?.y ?? 0,
+      width: c.absoluteBoundingBox?.width ?? 0,
+      height: c.absoluteBoundingBox?.height ?? 0,
     }))
     .sort((a: FrameChild, b: FrameChild) => a.y - b.y || a.x - b.x);
 
-  return { nodeId: node.id, name: node.name, type: node.type, children };
+  return {
+    nodeId: node.id,
+    name: node.name,
+    type: node.type,
+    width: node.absoluteBoundingBox?.width ?? 0,
+    height: node.absoluteBoundingBox?.height ?? 0,
+    children,
+  };
 }
 
 export interface FrameText {
