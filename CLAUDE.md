@@ -22,10 +22,20 @@ Plugin mínimo: link do Figma → revisão da Bia (gramática + nudez) → PNG �
 
 ```
 config/clientes.yaml              ← clickup_list_id + overrides de Drive por cliente
+hooks/hooks.json                  ← SessionStart hook (auto-descoberto pelo plugin)
+hooks/check-setup.js              ← avisa se ~/.stark-export/ nao esta configurado
 mcp-servers/figma-drive/          ← MCP server embutido (dist/ bundled, commitado)
 ~/.stark-export/credentials.json  ← service account Google (criado pelo setup)
 ~/.stark-export/config.json       ← token do Figma (criado pelo setup)
 ```
+
+## Onboarding padronizado (hook)
+
+`hooks/check-setup.js` roda em todo `SessionStart`. Se faltar `config.json` (token Figma)
+ou `credentials.json` (Google) em `~/.stark-export/`, injeta um aviso (`systemMessage`) pedindo
+`/stark-export:setup` — igual para todo mundo. **Nao bloqueia** nada e sai silencioso quando
+configurado. Cross-platform via `node`. Editou o script → testar com `node hooks/check-setup.js`
+(stdout vazio = configurado; JSON = falta setup).
 
 ## Desenvolvimento do MCP server
 
