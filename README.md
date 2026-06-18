@@ -18,20 +18,21 @@ Baixe a versão LTS em [nodejs.org](https://nodejs.org) e instale (se já tiver,
 
 ### 2. Instale o plugin
 
-**Cole o link do repositório no chat do Claude Code e peça pra instalar:**
+Rode **estes dois comandos** (no terminal, ou colando no chat do Claude Code):
 
 ```
-Instala esse plugin pra mim: https://github.com/milenacarneiro-art/stark-export-plugin
+claude plugin marketplace add milenacarneiro-art/stark-export-plugin
+claude plugin install stark-export@stark-export
 ```
 
-O Claude adiciona o marketplace e instala (clona o repo pra `~/.claude/plugins/`).
-Ao final, **reinicie o Claude Code**.
+Ao final, **reinicie o Claude Code**. Devem aparecer os comandos
+`/stark-export:exportar` e `/stark-export:setup`.
 
-> Equivalente pelo terminal, se preferir digitar:
-> ```
-> claude plugin marketplace add milenacarneiro-art/stark-export-plugin
-> claude plugin install stark-export@stark-export
-> ```
+> ⚠️ **Não peça "instala esse plugin" colando só o link.** Em texto livre o Claude
+> às vezes inventa um comando local com nome qualquer (ex: `/alocar-arquivo-drive`)
+> em vez de instalar o plugin — e aí falta o MCP, faltam os hooks e a máquina nunca
+> recebe atualização. Use os comandos acima. Passo a passo completo (e como limpar
+> um comando improvisado): [docs/instalar-plugin.md](docs/instalar-plugin.md).
 
 A instalação vale pro usuário inteiro — funciona no app e no terminal. Para atualizar
 depois, veja [docs/atualizar-plugin.md](docs/atualizar-plugin.md).
