@@ -98,8 +98,11 @@ figma_to_drive({
 
 ### 5. Atualizar ClickUp (sequencial, nunca em paralelo)
 
-1. `clickup_filter_tasks` na lista `clickup_list_id` (incluir subtarefas) → encontrar a subtarefa do cliente com a data do frame. Usar `clickup_alias` do config na busca, se existir.
-   - Data não bate com nenhuma subtarefa → listar candidatas próximas e perguntar em texto qual usar. Confirmada → seguir com ela e avisar a designer para corrigir o nome do frame no Figma.
+1. `clickup_filter_tasks` na lista `clickup_list_id` **sempre com janela de data** — `clickup_filter_tasks` devolve no máximo 100 tarefas por página, então puxar a lista inteira e procurar na página **perde tarefas vencidas** (a página vem ordenada pelas datas mais recentes; as atrasadas ficam fora das 100). Filtrar pela data do frame:
+   - Converter a data do frame para `YYYY-MM-DD` (frame `DD-MM` sem ano → assumir o ano atual). Passar uma janela de ±1 dia para absorver fuso: `due_date_from` = data−1, `due_date_to` = data+1.
+   - `subtasks: true`, `include_closed: true`, **sem filtro de `statuses`** — a tarefa pode estar em qualquer status (`edição`, vencida, etc.); restringir status esconde justamente a que você procura.
+   - No resultado (poucas tarefas), achar a subtarefa do cliente pela data exata + nome. Usar `clickup_alias` do config na busca, se existir.
+   - Janela vazia ou nenhuma bate com o cliente → alargar para ±3 dias e listar candidatas próximas, perguntar em texto qual usar. Confirmada → seguir com ela e avisar a designer para corrigir o nome do frame no Figma.
 2. Ler os `assignees` da **tarefa-mãe** da subtarefa (para o @-mention; se não houver, omitir o prefixo).
 3. `clickup_create_task_comment` — **obrigatório, antes do status**:
    `@[responsável] ✅ Agendas exportadas e enviadas para o Drive do cliente. 📁 [folderLink]`
@@ -116,4 +119,4 @@ Tabela: cliente · data · revisão (✅ / 🚫 / sem revisão) · modo (single/
 | `FIGMA_TOKEN nao encontrado` / `credentials nao encontrado` | Orientar `/stark-export:setup` |
 | `Pasta do cliente nao encontrada` | Conferir `drive_nome` no `config/clientes.yaml` ou se a pasta foi compartilhada com o service account |
 | URL sem `node-id` | Pedir o link com o frame selecionado (Ctrl/Cmd+L) |
-| Subtarefa ClickUp não encontrada | Listar candidatas e perguntar em texto |
+| Subtarefa ClickUp não encontrada | Filtrar por janela de data (`due_date_from`/`due_date_to`), **não** pela lista inteira — o filtro corta em 100 e esconde tarefas vencidas. Ainda sem achar → alargar a janela e listar candidatas |

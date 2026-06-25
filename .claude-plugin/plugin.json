@@ -1,6 +1,6 @@
 {
   "name": "stark-export",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Exporta agendas do Figma para o Google Drive e notifica pelo ClickUp. Cole o link do frame, o resto é automático. Requer o conector ClickUp conectado (/mcp) e /stark-export:setup na primeira vez.",
   "author": {
     "name": "Stark Marketing",
