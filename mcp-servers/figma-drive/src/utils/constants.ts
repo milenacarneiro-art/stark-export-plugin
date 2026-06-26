@@ -7,7 +7,7 @@ export const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3';
 export const DRIVE_UPLOAD_BASE = 'https://www.googleapis.com/upload/drive/v3';
 
 export const DEFAULT_OUTPUT = join(tmpdir(), 'figma_exports');
-export const DEFAULT_SCALE = 2;
+export const DEFAULT_SCALE = 1;
 export const DEFAULT_BATCH_SIZE = 5;
 
 /** Pasta de config do designer: ~/.stark-export/ */

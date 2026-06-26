@@ -5,7 +5,7 @@ export const exportFigmaSchema = z.object({
   fileKey: z.string().describe('File key do Figma (segmento apos /design/ na URL)'),
   nodeIds: z.array(z.string()).describe('Node IDs para exportar (ex: ["1038:6", "1038:16"])'),
   prefix: z.string().describe('Prefixo dos arquivos exportados (ex: "2026-03-17-Stark")'),
-  scale: z.number().optional().default(2).describe('Escala do export (default: 2)'),
+  scale: z.number().optional().default(1).describe('Escala do export (default: 1 — tamanho 1x, regra fixa Stark)'),
   outputDir: z.string().optional().describe('Diretorio de saida (default: pasta temporaria)'),
 });
 

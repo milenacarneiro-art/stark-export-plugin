@@ -21113,7 +21113,7 @@ var FIGMA_API_BASE = "https://api.figma.com/v1";
 var DRIVE_API_BASE = "https://www.googleapis.com/drive/v3";
 var DRIVE_UPLOAD_BASE = "https://www.googleapis.com/upload/drive/v3";
 var DEFAULT_OUTPUT = join(tmpdir(), "figma_exports");
-var DEFAULT_SCALE = 2;
+var DEFAULT_SCALE = 1;
 var DEFAULT_BATCH_SIZE = 5;
 var CONFIG_DIR = join(homedir(), ".stark-export");
 function cleanEnv(value) {
@@ -21360,7 +21360,7 @@ var exportFigmaSchema = external_exports.object({
   fileKey: external_exports.string().describe("File key do Figma (segmento apos /design/ na URL)"),
   nodeIds: external_exports.array(external_exports.string()).describe('Node IDs para exportar (ex: ["1038:6", "1038:16"])'),
   prefix: external_exports.string().describe('Prefixo dos arquivos exportados (ex: "2026-03-17-Stark")'),
-  scale: external_exports.number().optional().default(2).describe("Escala do export (default: 2)"),
+  scale: external_exports.number().optional().default(1).describe("Escala do export (default: 1 \u2014 tamanho 1x, regra fixa Stark)"),
   outputDir: external_exports.string().optional().describe("Diretorio de saida (default: pasta temporaria)")
 });
 async function handleExportFigma(input) {
@@ -21737,7 +21737,7 @@ var fullPipelineSchema = external_exports.object({
   extraFiles: external_exports.array(external_exports.string()).optional().describe(
     "Caminhos locais de arquivos extras para subir junto (ex: .mp4 de Reels)."
   ),
-  scale: external_exports.number().optional().default(2).describe("Escala do export (default: 2)"),
+  scale: external_exports.number().optional().default(1).describe("Escala do export (default: 1 \u2014 tamanho 1x, regra fixa Stark)"),
   dryRun: external_exports.boolean().optional().default(false).describe("Se true, so navega o Drive sem exportar nem subir.")
 });
 function parseFigmaUrl(figmaUrl) {

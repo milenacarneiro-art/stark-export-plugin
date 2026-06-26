@@ -28,7 +28,7 @@ export const fullPipelineSchema = z.object({
   extraFiles: z.array(z.string()).optional().describe(
     'Caminhos locais de arquivos extras para subir junto (ex: .mp4 de Reels).'
   ),
-  scale: z.number().optional().default(2).describe('Escala do export (default: 2)'),
+  scale: z.number().optional().default(1).describe('Escala do export (default: 1 — tamanho 1x, regra fixa Stark)'),
   dryRun: z.boolean().optional().default(false).describe('Se true, so navega o Drive sem exportar nem subir.'),
 });
 
